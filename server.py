@@ -1,11 +1,19 @@
 # =============================================================================
-# IMPORTS - Import required libraries for web app, encryption, and encoding
+# IMPORTS - Import required libraries for web app, encryption, and environment management
 # =============================================================================
-
 from flask import Flask, render_template
 from flask_socketio import SocketIO, emit
 from Crypto.Cipher import AES
 import base64
+import os
+from dotenv import load_dotenv
+
+# =============================================================================
+# ENVIRONMENT SETUP - Load environment variables from .env file
+# =============================================================================
+# Load environment variables from .env file in project directory
+# This allows storing secrets in a .env file instead of hardcoding them
+load_dotenv()
 
 # =============================================================================
 # APPLICATION SETUP - Initialize Flask app and SocketIO for real-time communication
@@ -18,8 +26,9 @@ socketio = SocketIO(app)
 # ENCRYPTION CONFIGURATION - AES encryption key and helper functions
 # =============================================================================
 
-# 16-byte AES key (must be exactly 16 bytes for AES-128)
-key = b"ThisIsA16ByteKey"
+# Get AES key from environment variable or use default, convert to bytes
+# Environment variable allows secure key management without hardcoding
+key = os.environ.get("AES_KEY", "ThisIsA16ByteKey").encode()key = b"ThisIsA16ByteKey"
 
 def pad(s):
 	"""
