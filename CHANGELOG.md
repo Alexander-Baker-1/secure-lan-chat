@@ -1,3 +1,11 @@
+# [1.2.0](https://github.com/Alexander-Baker-1/secure-lan-chat/compare/v1.1.1...v1.2.0) (2025-05-31)
+
+
+### Features
+
+* test automatic version bump ([b6837f4](https://github.com/Alexander-Baker-1/secure-lan-chat/commit/b6837f4b507666f8e618aef40f79d639a52d40d0))
+* test automatic version bump ([776622d](https://github.com/Alexander-Baker-1/secure-lan-chat/commit/776622d4fec51145bc1e9220b23b3ca59e8bc7db))
+
 ## [1.1.1](https://github.com/Alexander-Baker-1/secure-lan-chat/compare/v1.1.0...v1.1.1) (2025-05-31)
 
 
