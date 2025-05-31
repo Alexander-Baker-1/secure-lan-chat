@@ -8,32 +8,29 @@ on:
 jobs:
   tag:
     runs-on: ubuntu-latest
+
     steps:
-      - name: Checkout repo
+      - name: 🔄 Checkout full repo history
         uses: actions/checkout@v3
         with:
-          fetch-depth: 0
+          fetch-depth: 0  # Grab full commit + tag history
 
-      - name: Set up Git
+      - name: 🧠 Ensure full tag + commit context
         run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git fetch --unshallow || true
+          git fetch --tags
 
-      - name: Fetch all tags
-        run: git fetch --tags
-
-      - name: Get latest tag
+      - name: 🏷️ Get latest tag
         id: get_tag
         run: |
           latest=$(git describe --tags --abbrev=0 2>/dev/null || echo "v0.0.0")
           echo "Latest tag: $latest"
           echo "tag=$latest" >> $GITHUB_OUTPUT
 
-      - name: Bump patch version
+      - name: ⬆️ Bump patch version
         id: bump_tag
         run: |
           tag=${{ steps.get_tag.outputs.tag }}
-          if [ -z "$tag" ]; then tag="v0.0.0"; fi
           version=${tag#v}
           IFS='.' read -r major minor patch <<< "$version"
           patch=$((patch + 1))
@@ -41,12 +38,17 @@ jobs:
           echo "New tag: $new_tag"
           echo "tag=$new_tag" >> $GITHUB_OUTPUT
 
-      - name: Create tag
+      - name: 🛠️ Configure Git
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+      - name: 🔖 Create and push new tag
         run: |
           git tag ${{ steps.bump_tag.outputs.tag }}
           git push origin ${{ steps.bump_tag.outputs.tag }}
 
-      - name: Create GitHub Release
+      - name: 🚀 Create GitHub Release
         uses: softprops/action-gh-release@v1
         with:
           tag_name: ${{ steps.bump_tag.outputs.tag }}
