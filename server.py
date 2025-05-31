@@ -102,4 +102,4 @@ def handle_message(data):
 if __name__ == "__main__":
 	ssl_context = (os.getenv("SSL_CERT"), os.getenv("SSL_KEY"))
 	# Run server on all network interfaces, port 5000
-	socketio.run(app, host="0.0.0.0", port=5000, ssl_context=(ssl_context)
+	socketio.run(app, host="0.0.0.0", port=5000, ssl_context=(ssl_context))

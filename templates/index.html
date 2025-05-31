@@ -50,7 +50,9 @@
 			// Convert base64 back to binary data
 			const encryptedBytes = Uint8Array.from(atob(b64), c => c.charCodeAt(0));
 			const encoder = new TextEncoder();
+			const keyBytes = encoder.encode(key);
 			const iv = encryptedBytes.slice(0, 16);
+			const ciphertext = encryptedBytes.slice(16);
 			
 			// Import key for decryption
 			const cryptoKey = await crypto.subtle.importKey("raw", keyBytes, { name: "AES-CBC" }, false, ["decrypt"]);
