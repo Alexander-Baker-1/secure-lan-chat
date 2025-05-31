@@ -34,11 +34,15 @@
 		async function encrypt(msg) {
 			const padded = pad(msg);
 			const encoder = new TextEncoder();
-			const keyBytes = encoder.encode(key);
+			const keyBytes = encoder.encode(key.padEnd(16));
 			const dataBytes = encoder.encode(padded);
-			const cryptoKey = await crypto.subtle.importKey("raw", keyBytes, "AES-ECB", false, ["encrypt"]);
-			const encrypted = await crypto.subtle.encrypt({ name: "AES-ECB" }, cryptoKey, dataBytes);
-			return btoa(String.fromCharCode(...new Uint8Array(encrypted)));
+			const iv = crypto.getRandomValues(new Uint8Array(16));
+			const cryptoKey = await crypto.subtle.importKey("raw", keyBytes, { name: "AES-CBC" }, false, ["encrypt"]);
+			const encrypted = await crypto.subtle.encrypt({ name: "AES-CBC", iv: iv }, cryptoKey, dataBytes);
+			const combined = new Uint8Array(iv.length + encrypted.byteLength);
+			combined.set(iv, 0);
+			combined.set(new Uint8Array(encrypted), iv.length);
+			return btoa(String.fromCharCode(...combined));
 		}
 		
 		// Properly decrypt AES-encrypted base64 data
@@ -46,13 +50,13 @@
 			// Convert base64 back to binary data
 			const encryptedBytes = Uint8Array.from(atob(b64), c => c.charCodeAt(0));
 			const encoder = new TextEncoder();
-			const keyBytes = encoder.encode(key);
+			const iv = encryptedBytes.slice(0, 16);
 			
 			// Import key for decryption
-			const cryptoKey = await crypto.subtle.importKey("raw", keyBytes, "AES-ECB", false, ["decrypt"]);
+			const cryptoKey = await crypto.subtle.importKey("raw", keyBytes, { name: "AES-CBC" }, false, ["decrypt"]);
 			
 			// Perform AES decryption
-			const decrypted = await crypto.subtle.decrypt({ name: "AES-ECB" }, cryptoKey, encryptedBytes);
+			const decrypted = await crypto.subtle.decrypt({ name: "AES-CBC", iv: iv }, cryptoKey, ciphertext);
 			
 			// Convert decrypted bytes back to string and remove padding
 			return new TextDecoder().decode(decrypted).trim();
