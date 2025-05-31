@@ -1,3 +1,9 @@
+# 📦 Changelog
+
+All notable changes to this project will be documented here.
+
+---
+
 ## [1.3.1](https://github.com/Alexander-Baker-1/secure-lan-chat/compare/v1.3.0...v1.3.1) (2025-05-31)
 
 
@@ -11,12 +17,6 @@
 ### Features
 
 * **security:** move AES key and encryption logic into secure closure ([1ad7f16](https://github.com/Alexander-Baker-1/secure-lan-chat/commit/1ad7f16537939c5dc14148b53d370cf12de29ed5))
-
-# 📦 Changelog
-
-All notable changes to this project will be documented here.
-
----
 
 ## [1.2.0](https://github.com/Alexander-Baker-1/secure-lan-chat/compare/v1.1.1...v1.2.0) (2025-05-31)
 
