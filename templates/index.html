@@ -1,101 +1,104 @@
 <!DOCTYPE html>
 <html>
 <head>
-	<title>Secure Chat App 🔒</title>
+        <title>Secure Chat App 🔒</title>
 </head>
 <body>
-	<!-- Chat Interface with Enhanced Styling -->
-	<h1>Secure Chat App 🔐💬🔥</h1>
-	<input id="msg" placeholder="Type your message..." />
-	<button onclick="send()">Send 📨</button>
-	<div id="chat"></div>
-	
-	<!-- Load Socket.IO library from CDN for WebSocket communication -->
-	<script src="https://cdn.socket.io/4.5.0/socket.io.min.js"></script>
-	
-	<script>
-		// ================================================================
-		// GLOBAL VARIABLES - Store encryption key and socket connection
-		// ================================================================
-		let key = null;  // AES encryption key (received from server on connect)
-		const socket = io();  // WebSocket connection to Flask-SocketIO server
-		
-		// ================================================================
-		// ENCRYPTION HELPER FUNCTIONS - AES encryption using Web Crypto API
-		// ================================================================
-		
-		// Pad string to 16-byte blocks for AES
-		function pad(str) {
-			const padLength = 16 - (str.length % 16);
-			return str + " ".repeat(padLength);
-		}
-		
-		// Encrypt message using Web Crypto API
-		async function encrypt(msg) {
-			const padded = pad(msg);
-			const encoder = new TextEncoder();
-			const keyBytes = encoder.encode(key.padEnd(16));
-			const dataBytes = encoder.encode(padded);
-			const iv = crypto.getRandomValues(new Uint8Array(16));
-			const cryptoKey = await crypto.subtle.importKey("raw", keyBytes, { name: "AES-CBC" }, false, ["encrypt"]);
-			const encrypted = await crypto.subtle.encrypt({ name: "AES-CBC", iv: iv }, cryptoKey, dataBytes);
-			const combined = new Uint8Array(iv.length + encrypted.byteLength);
-			combined.set(iv, 0);
-			combined.set(new Uint8Array(encrypted), iv.length);
-			return btoa(String.fromCharCode(...combined));
-		}
-		
-		// Properly decrypt AES-encrypted base64 data
-		async function decrypt(b64) {
-			// Convert base64 back to binary data
-			const encryptedBytes = Uint8Array.from(atob(b64), c => c.charCodeAt(0));
-			const encoder = new TextEncoder();
-			const keyBytes = encoder.encode(key);
-			const iv = encryptedBytes.slice(0, 16);
-			const ciphertext = encryptedBytes.slice(16);
-			
-			// Import key for decryption
-			const cryptoKey = await crypto.subtle.importKey("raw", keyBytes, { name: "AES-CBC" }, false, ["decrypt"]);
-			
-			// Perform AES decryption
-			const decrypted = await crypto.subtle.decrypt({ name: "AES-CBC", iv: iv }, cryptoKey, ciphertext);
-			
-			// Convert decrypted bytes back to string and remove padding
-			return new TextDecoder().decode(decrypted).trim();
-		}
-		
-		// ================================================================
-		// MESSAGE SENDING FUNCTION - Encrypt and send user messages
-		// ================================================================
-		async function send() {
-			// Check if encryption key has been received from server
-			if (!key) {
-				alert("🔑 AES key not loaded yet! Please wait.");
-				return;
-			}
-			
-			const msg = document.getElementById("msg").value;
-			const encrypted = await encrypt(msg);
-			socket.send(encrypted);
-			document.getElementById("msg").value = "";
-		}
-		
-		// ================================================================
-		// WEBSOCKET EVENT HANDLERS - Handle server communication
-		// ================================================================
-		
-		// Receive AES key from server on connect
-		socket.on("aes_key", (k) => {
-			console.log("🔑 Received AES key");
-			key = k;
-		});
-		
-		// Receive and decrypt server messages with proper AES decryption
-		socket.on("message", async (data) => {
-			const decrypted = await decrypt(data);
-			const chat = document.getElementById("chat");
-			chat.innerHTML += `<div>🛡️ <b>Server:</b> ${decrypted}</div>`;
-		});
-	</script>
+        <!-- Chat Interface with Enhanced Styling -->
+        <h1>Secure Chat App 🔐💬🔥</h1>
+        <input id="msg" placeholder="Type your message..." />
+        <button id="sendBtn">Send 📨</button>
+        <div id="chat"></div>
+
+        <!-- Load Socket.IO library from CDN for WebSocket communication -->
+        <script src="https://cdn.socket.io/4.5.0/socket.io.min.js"></script>
+
+        <script>
+                // ================================================================
+                // SECURE ENCRYPTION MODULE - Prevent global access to key or logic
+                // ================================================================
+                (function () {
+
+                        // ================================================================
+                        // PRIVATE VARIABLES - AES encryption key and socket connection
+                        // ================================================================
+                        let aesKey = null;  // AES encryption key (received from server on connect)
+                        const socket = io();  // WebSocket connection to Flask-SocketIO server
+
+                        // ================================================================
+                        // ENCRYPTION HELPER FUNCTIONS - AES encryption using Web Crypto API
+                        // ================================================================
+                        // Pad string to 16-byte blocks for AES
+                        function pad(str) {
+                                const padLength = 16 - (str.length % 16);
+                                return str + " ".repeat(padLength);
+                        }
+
+                        // Encrypt message using Web Crypto API
+                        async function encrypt(msg) {
+                                const padded = pad(msg);
+                                const encoder = new TextEncoder();
+                                const keyBytes = encoder.encode(aesKey.padEnd(16));
+                                const dataBytes = encoder.encode(padded);
+                                const iv = crypto.getRandomValues(new Uint8Array(16));
+                                const cryptoKey = await crypto.subtle.importKey("raw", keyBytes, { name: "AES-CBC" }, false, ["encrypt"]);
+                                const encrypted = await crypto.subtle.encrypt({ name: "AES-CBC", iv: iv }, cryptoKey, dataBytes);
+                                const combined = new Uint8Array(iv.length + encrypted.byteLength);
+                                combined.set(iv, 0);
+                                combined.set(new Uint8Array(encrypted), iv.length);
+                                return btoa(String.fromCharCode(...combined));
+                        }
+
+                        // Properly decrypt AES-encrypted base64 data
+                        async function decrypt(b64) {
+                                const encryptedBytes = Uint8Array.from(atob(b64), c => c.charCodeAt(0));
+                                const encoder = new TextEncoder();
+                                const keyBytes = encoder.encode(aesKey.padEnd(16));
+                                const iv = encryptedBytes.slice(0, 16);
+                                const ciphertext = encryptedBytes.slice(16);
+                                const cryptoKey = await crypto.subtle.importKey("raw", keyBytes, { name: "AES-CBC" }, false, ["decrypt"]);
+                                const decrypted = await crypto.subtle.decrypt({ name: "AES-CBC", iv: iv }, cryptoKey, ciphertext);
+                                return new TextDecoder().decode(decrypted).trim();
+                        }
+
+                        // ================================================================
+                        // MESSAGE SENDING FUNCTION - Encrypt and send user messages
+                        // ================================================================
+                        async function handleSend() {
+                                if (!aesKey) {
+                                        alert("🔑 AES key not loaded yet! Please wait.");
+                                        return;
+                                }
+
+                                const msg = document.getElementById("msg").value;
+                                const encrypted = await encrypt(msg);
+                                socket.send(encrypted);
+                                document.getElementById("msg").value = "";
+                        }
+
+                        // ================================================================
+                        // WEBSOCKET EVENT HANDLERS - Handle server communication
+                        // ================================================================
+
+                        // Receive AES key from server on connect
+                        socket.on("aes_key", (k) => {
+                                console.log("🔑 Received AES key");
+                                aesKey = k;
+                        });
+
+                        // Receive and decrypt server messages with proper AES decryption
+                        socket.on("message", async (data) => {
+                                const decrypted = await decrypt(data);
+                                const chat = document.getElementById("chat");
+                                chat.innerHTML += `<div>🛡️ <b>Server:</b> ${decrypted}</div>`;
+                        });
+
+                        // ================================================================
+                        // UI EVENT BINDING - Attach click handler for send button
+                        // ================================================================
+                        document.getElementById("sendBtn").addEventListener("click", handleSend);
+
+                })();  // End of secure closure
+        </script>
 </body>
 </html>
