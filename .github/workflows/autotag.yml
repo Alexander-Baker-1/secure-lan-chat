@@ -1,4 +1,4 @@
-name: 🔖 Auto Tag and Release
+name: 🚀 Semantic Release
 
 on:
   push:
@@ -9,51 +9,24 @@ permissions:
   contents: write
 
 jobs:
-  tag:
+  release:
     runs-on: ubuntu-latest
 
     steps:
-      - name: 🔄 Checkout full repo history
+      - name: Checkout code
         uses: actions/checkout@v3
         with:
-          fetch-depth: 0  # Grab full commit + tag history
+          fetch-depth: 0
 
-      - name: 🧠 Ensure full tag + commit context
-        run: |
-          git fetch --unshallow || true
-          git fetch --tags
-
-      - name: 🏷️ Get latest tag
-        id: get_tag
-        run: |
-          latest=$(git describe --tags --abbrev=0 2>/dev/null || echo "v0.0.0")
-          echo "Latest tag: $latest"
-          echo "tag=$latest" >> $GITHUB_OUTPUT
-
-      - name: ⬆️ Bump patch version
-        id: bump_tag
-        run: |
-          tag=${{ steps.get_tag.outputs.tag }}
-          version=${tag#v}
-          IFS='.' read -r major minor patch <<< "$version"
-          patch=$((patch + 1))
-          new_tag="v$major.$minor.$patch"
-          echo "New tag: $new_tag"
-          echo "tag=$new_tag" >> $GITHUB_OUTPUT
-
-      - name: 🛠️ Configure Git
-        run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-
-      - name: 🔖 Create and push new tag
-        run: |
-          git tag ${{ steps.bump_tag.outputs.tag }}
-          git push origin ${{ steps.bump_tag.outputs.tag }}
-
-      - name: 🚀 Create GitHub Release
-        uses: softprops/action-gh-release@v1
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
         with:
-          tag_name: ${{ steps.bump_tag.outputs.tag }}
+          node-version: 18
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Run Semantic Release
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: npx semantic-release

@@ -1,0 +1,26 @@
+{
+  "name": "securechat",
+  "version": "1.0.0",
+  "description": "A secure, LAN-based encrypted chat app built with Flask + WebSockets.   Designed to demonstrate all **7 layers of the OSI model** through a real, working project.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Alexander-Baker-1/secure-lan-chat.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Alexander-Baker-1/secure-lan-chat/issues"
+  },
+  "homepage": "https://github.com/Alexander-Baker-1/secure-lan-chat#readme",
+  "devDependencies": {
+    "@semantic-release/changelog": "^6.0.3",
+    "@semantic-release/git": "^10.0.1",
+    "@semantic-release/github": "^11.0.3",
+    "semantic-release": "^24.2.5"
+  }
+}
