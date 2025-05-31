@@ -1,3 +1,10 @@
+## [1.3.1](https://github.com/Alexander-Baker-1/secure-lan-chat/compare/v1.3.0...v1.3.1) (2025-05-31)
+
+
+### Bug Fixes
+
+* remove npm plugin from semantic-release config 🔧 ([bd06c0c](https://github.com/Alexander-Baker-1/secure-lan-chat/commit/bd06c0c68dffede95d7b99d8196702573dcbd2ae))
+
 # [1.3.0](https://github.com/Alexander-Baker-1/secure-lan-chat/compare/v1.2.0...v1.3.0) (2025-05-31)
 
 
