@@ -18,17 +18,15 @@ load_dotenv()
 # =============================================================================
 # APPLICATION SETUP - Initialize Flask app and SocketIO for real-time communication
 # =============================================================================
-
 app = Flask(__name__)
 socketio = SocketIO(app)
 
 # =============================================================================
 # ENCRYPTION CONFIGURATION - AES encryption key and helper functions
 # =============================================================================
-
 # Get AES key from environment variable or use default, convert to bytes
 # Environment variable allows secure key management without hardcoding
-key = os.environ.get("AES_KEY", "ThisIsA16ByteKey").encode()key = b"ThisIsA16ByteKey"
+key = os.environ.get("AES_KEY", "ThisIsA16ByteKey").encode()
 
 def pad(s):
 	"""
@@ -60,16 +58,28 @@ def decrypt(b64msg):
 # =============================================================================
 # WEB ROUTES - Handle HTTP requests for serving web pages
 # =============================================================================
-
 @app.route("/")
 def index():
 	"""Serve the main HTML page to clients"""
     	return render_template("index.html")
 
 # =============================================================================
+# WEBSOCKET EVENT HANDLERS - Process real-time messages and connections
+# =============================================================================
+@socketio.on('connect')
+def send_key():
+    """
+    Handle new client connections - automatically send AES key to frontend
+    
+    SECURITY WARNING: This sends the encryption key in plain text over the network!
+    In production, use proper key exchange protocols (Diffie-Hellman, RSA, etc.)
+    This approach is only suitable for learning/development purposes.
+    """
+    emit('aes_key', key.decode())  # Convert bytes back to string and send to client
+
+# =============================================================================
 # WEBSOCKET EVENT HANDLERS - Process real-time messages from clients
 # =============================================================================
-
 @socketio.on("message")
 def handle_message(data):
 	"""
@@ -91,7 +101,6 @@ def handle_message(data):
 # =============================================================================
 # APPLICATION STARTUP - Start the server when script is run directly
 # =============================================================================
-
 if __name__ == "__main__":
 	# Run server on all network interfaces, port 5000
     	socketio.run(app, host="0.0.0.0", port=5000)
