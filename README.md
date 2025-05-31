@@ -1,4 +1,6 @@
 # 🔐 Secure LAN Chat
+![Release](https://img.shields.io/github/v/release/Alexander-Baker-1/secure-lan-chat?label=release)
+![CI](https://github.com/Alexander-Baker-1/secure-lan-chat/actions/workflows/release.yml/badge.svg)
 
 A secure, LAN-based encrypted chat app built with Flask + WebSockets.  
 Designed to demonstrate all **7 layers of the OSI model** through a real, working project.
@@ -24,19 +26,37 @@ Designed to demonstrate all **7 layers of the OSI model** through a real, workin
 
 5. On another device (phone, iPad, laptop), visit in your browser:
    ```
-   http://<your-server-ip>:5000
+   https://<your-server-ip>:5000
    ```
-   Example: `http://192.168.1.55:5000`  
+   Example: `https://192.168.1.55:5000`  
    Make sure the device is on the **same local network (LAN)**.
 
 ---
 
 ## 💬 Features
 
-- End-to-end AES encryption (ECB for demo purposes)
+- End-to-end AES encryption (AES-CBC with random IVs)
 - WebSocket-based real-time messaging
 - Flask backend with browser-based frontend
 - Cross-device LAN access (any device w/ browser)
+- ✅ Secure HTTPS connection using self-signed TLS certificate
+- ✅ Auto versioned via Semantic Release
+- ✅ CHANGELOG and GitHub Releases auto-generated from commit messages
+
+---
+
+## 🛠 CI/CD + Versioning
+
+This project uses [semantic-release](https://semantic-release.gitbook.io/) for fully automated versioning and GitHub releases.
+
+- `feat:` → bumps **minor** (e.g. `1.2.0`)
+- `fix:` → bumps **patch** (e.g. `1.2.1`)
+- `feat!:` or `BREAKING CHANGE:` → bumps **major** (e.g. `2.0.0`)
+- CHANGELOG updates + GitHub releases are auto-generated
+
+To trigger a version bump, just commit using [Conventional Commits](https://www.conventionalcommits.org/):
+```bash
+git commit -m "feat: add group chat support"
 
 ---
 
@@ -64,12 +84,18 @@ Designed to demonstrate all **7 layers of the OSI model** through a real, workin
 
 ## 📁 Folder Structure
 
-```
+```markdown
 securechat/
 ├── server.py
 ├── templates/
 │   └── index.html
-├── venv/ (optional)
+├── .github/
+│   └── workflows/
+│       └── release.yml
+├── .releaserc
+├── package.json
+├── package-lock.json
+├── CHANGELOG.md
 ├── .gitignore
 └── README.md
 ```
